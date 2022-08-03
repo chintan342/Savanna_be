@@ -5,6 +5,7 @@ import nftService from '../services/nft-service';
 import nftRepo from '../repos/nft-repo';
 import mongoose from 'mongoose';
 import nftAssignee from '../repos/nft-assignee';
+import NFTAssigneeModel from 'src/models/nft-assignees';
 
 
 
@@ -97,6 +98,12 @@ router.post(p.update, async (req: Request, res: Response) => {
 router.post(p.assigneeNft, async (req: Request, res: Response) => {
     const { id } = req.params;
     const { assignee } = req.body;
+    const updateAssignee = await NFTAssigneeModel.updateMany({
+        nft_id: new mongoose.Types.ObjectId(id),
+    }, {
+        is_active: false,
+        is_delete: false
+    });
     // Fetch data
     const arr = assignee.split(',');
     for (let wallet_address of arr) {

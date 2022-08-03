@@ -20,6 +20,7 @@ const nft_service_1 = __importDefault(require("../services/nft-service"));
 const nft_repo_1 = __importDefault(require("../repos/nft-repo"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const nft_assignee_1 = __importDefault(require("../repos/nft-assignee"));
+const nft_assignees_1 = __importDefault(require("src/models/nft-assignees"));
 // Constants
 const router = (0, express_1.Router)();
 const { CREATED, OK, BAD_REQUEST, INTERNAL_SERVER_ERROR } = http_status_codes_1.default;
@@ -59,9 +60,9 @@ router.get(exports.p.get, (_, res) => __awaiter(void 0, void 0, void 0, function
  * Add one user.
  */
 router.post(exports.p.add, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { nft_name, image, type, rank, state, quantity, bronze_uri, silver_uri, gold_uri, claim_uri } = req.body;
+    const { nft_name, image, type, rank, state, quantity, bronze_uri, silver_uri, gold_uri, claim_uri, media_uri } = req.body;
     // Check param
-    if (!nft_name || !image || !type || !rank || !state || !quantity || !bronze_uri || !silver_uri || !gold_uri) {
+    if (!nft_name || !image || !type || !rank || !state || !quantity) {
         throw new errors_1.ParamMissingError();
     }
     // Fetch data
@@ -75,13 +76,14 @@ router.post(exports.p.add, (req, res) => __awaiter(void 0, void 0, void 0, funct
         bronze_uri,
         silver_uri,
         gold_uri,
-        claim_uri
+        claim_uri,
+        media_uri
     });
     return res.status(CREATED).end();
 }));
 router.post(exports.p.update, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const { nft_name, image, type, rank, state, quantity, bronze_uri, silver_uri, gold_uri, claim_uri } = req.body;
+    const { nft_name, image, type, rank, state, quantity, bronze_uri, silver_uri, gold_uri, claim_uri, media_uri } = req.body;
     // Fetch data
     yield nft_service_1.default.update(id, {
         nft_name,
@@ -93,13 +95,20 @@ router.post(exports.p.update, (req, res) => __awaiter(void 0, void 0, void 0, fu
         bronze_uri,
         silver_uri,
         gold_uri,
-        claim_uri
+        claim_uri,
+        media_uri
     });
     return res.status(CREATED).end();
 }));
 router.post(exports.p.assigneeNft, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const { assignee } = req.body;
+    const updateAssignee = yield nft_assignees_1.default.updateMany({
+        nft_id: new mongoose_1.default.Types.ObjectId(id),
+    }, {
+        is_active: false,
+        is_delete: false
+    });
     // Fetch data
     const arr = assignee.split(',');
     for (let wallet_address of arr) {

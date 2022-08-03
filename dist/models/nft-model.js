@@ -12,6 +12,7 @@ const schema = new mongoose_1.Schema({
     silver_uri: { type: String },
     gold_uri: { type: String },
     claim_uri: { type: String },
+    media_uri: { type: String },
     is_active: { type: Boolean, default: true },
     is_deleted: { type: Boolean, default: false }
 }, {
